@@ -1,0 +1,40 @@
+@font-face {
+    font-family: 'Stolzl';
+    src: url('./resurses/stolzl.otf');
+}
+
+:root{
+    --bia-gray-color-1: #7A7B85;
+    --bia-gray-color-2: #B0B1B5;
+    --Blue-Link: #308ADD;
+    --Dark: #2B2D35;
+    --Dark-Gray: #3C4049;
+    --Gray: #EAEEF4;
+    --Ligtn-Gray-Blue: #F4F6F9;
+    --Middle-Gray-Blue: #B8C4DB;
+    --Red: #F0303F;
+    --Red-Shade: #FEEAEC;
+    --Red-Status: #FF4F4F;
+    --Yellow-Status: #FADA6B;
+    --Blue-Status: #219EE4;
+    --White: #FFFFFF;
+    --font-big: 24px;
+    --font-medium: 16px;
+    --font-small: 14px;
+}
+
+*{ 
+    font-family: Stolzl;
+}
+
+body{
+    margin: 0px;
+    padding: 0px;
+    background-color: var(--Ligtn-Gray-Blue);
+}
+
+#root{
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
