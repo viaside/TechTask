@@ -42,8 +42,8 @@ const Item = styled.a`
     align-items: center;
     justify-content: center;
     gap: 10px;
-    background: ${props => props.active? "var(--Ligtn-Gray-Blue)" : ""};
-    border-left: ${props => props.active? "4px solid var(--Red)" : "4px solid transparent;"};
+    background: ${props => props.$active? "var(--Ligtn-Gray-Blue)" : ""};
+    border-left: ${props => props.$active? "4px solid var(--Red)" : "4px solid transparent;"};
 `
 
 function MainMenu() {

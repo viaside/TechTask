@@ -24,6 +24,7 @@ app.get('/schedule/:date', Schedule.getScheduleByMounth)
 app.post('/schedule', Schedule.createSchedule)
 app.put('/schedule/:id', Schedule.updateSchedule)
 app.delete('/schedule/:id', Schedule.deleteSchedule)
+app.delete('/scheduleByUser/:id', Schedule.deleteSchedule)
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)

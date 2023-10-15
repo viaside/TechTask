@@ -9,5 +9,11 @@ const Button = styled.div`
     border-radius: 18px;
     border: 2px solid var(--Dark, #2B2D35);
     font-size: var(--font-medium);
+    transition: 0.5s;
+    &:hover{
+        cursor: pointer;
+        background-color: var(--Dark);
+        color: var(--White);
+    }
 `   
 export default Button

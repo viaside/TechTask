@@ -67,41 +67,60 @@ const CellStart = styled.td`
     align-self: stretch;
 `
 
+const Modal = styled.div`
+    position: absolute;
+    border-radius: 8px;
+    box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.10), 0px 1px 2px 0px rgba(0, 0, 0, 0.14);
+    overflow: hidden;
+    gap:1px;
+` 
+
+const Button = styled.div`
+    display: flex;
+    width: 300px;
+    padding: 10px 24px;
+    align-items: flex-start;
+    background-color: var(--White);
+    font-size: var(--font-medium);
+    border-bottom: solid 1px var(--Gray);
+    transition: 0.5s;
+    &:hover{
+        cursor: pointer;
+        background-color: var(--Gray);
+    };
+`   
+
 function DateTable({NowMounth, users, AddUser, DeleteUser, AddSchedule, ChangeSchedule}) {
     const [Users, SetUsers] = useState([{}]);
     const [NewUser, SetNewUser] = useState(null);
+    const [isShowRedact, ShowRedact] = useState([]);
+    const QuantityDay = 32 - new Date(2023, NowMounth, 32).getDate();
     
     useEffect(() => {SetUsers(users)}, [users]);
 
-    const QuantityDay = 32 - new Date(2023, NowMounth, 32).getDate();
 
-    const AddDay = () => {
-        let content = [];
+    const AddDefaultRow = () => {
+        let Day = [];
+        let Week = [];
         for (let i = 1; i <= QuantityDay; i++) {
             const date = new Date(2023, NowMounth, i);
             if(date.getDay() === 0 || date.getDay() === 6){
-                content.push(<Cell style={{backgroundColor: "var(--Red-Shade)", color: "var(--Red)"}} key={i+"day"}>{i}</Cell>)
+                Day.push(<Cell style={{backgroundColor: "var(--Red-Shade)", color: "var(--Red)"}} key={i+"day"}>{i}</Cell>)
+                Week.push(<Cell style={{backgroundColor: "var(--Red-Shade)", color: "var(--Red)"}} key={i+"week"}>{WeekList[date.getDay()]}</Cell>)
             } else{
-                content.push(<Cell key={i+"day"}>{i}</Cell>);
+                Day.push(<Cell key={i+"day"}>{i}</Cell>);
+                Week.push(<Cell key={i+"week"}>{WeekList[date.getDay()]}</Cell>);
             }
         }
-        return content;
-    }
-
-    const AddWeek = () => {
-        let content = [];
-        for (let i = 1; i <= QuantityDay; i++) {
-            const date = new Date(2023, NowMounth, i);
-            if(date.getDay() === 0 || date.getDay() === 6){
-                content.push(<Cell style={{backgroundColor: "var(--Red-Shade)", color: "var(--Red)"}} key={i+"week"}>{WeekList[date.getDay()]}</Cell>)
-            } else{
-                content.push(<Cell key={i+"week"}>{WeekList[date.getDay()]}</Cell>);
-            }
-        }
-        return content;
+        return (
+            <>
+                <RowDefault><CellStart></CellStart>{Week}</RowDefault>
+                <RowDefault><CellStart>Сотрудник</CellStart>{Day}</RowDefault>
+            </>
+        );
     }
     
-    const AddDayEmpty = () => {
+    const AddBottomRow = () => {
         let content = [];
         for (let i = 1; i <= QuantityDay; i++) {
             const date = new Date(2023, NowMounth, i);
@@ -113,7 +132,18 @@ function DateTable({NowMounth, users, AddUser, DeleteUser, AddSchedule, ChangeSc
         }
         return content;
     }
-    
+
+    const MoreAddSchedule = (type) => {
+        isShowRedact.forEach(el => {
+            if(el.isNew){
+                AddSchedule(el.userID, el.date, type);
+            }else{
+                ChangeSchedule(el.idSchedule, type);
+            }
+        });
+        ShowRedact([]);
+    }
+
     const AddDayOperator = (UserID, Schedule) => {
         let content = [];
         for (let i = 1; i <= QuantityDay; i++) {
@@ -121,19 +151,39 @@ function DateTable({NowMounth, users, AddUser, DeleteUser, AddSchedule, ChangeSc
             if(date.getDay() === 0 || date.getDay() === 6){
                 content.push(<Cell style={{backgroundColor: "var(--Red-Shade)"}} key={i+"dayOp"}>Н</Cell>)
             } else{
-                if(Schedule !== undefined){
-                    let Added = false;
-                    Schedule.map(el => {
-                        if(el.date === date.toISOString()){
-                            content.push(<UserCell key={i+" dayOp"} idSchedule={el.id} idUser={UserID} Func={ChangeSchedule} Date={el.date} TypeId={el.type_id-1}/>) 
-                            Added = true;
-                        }
-                    })
-                    if(!Added){
-                        content.push(<UserCell key={i+" dayOp"} idSchedule={null} idUser={UserID} Func={AddSchedule} Date={date} TypeId={null}/>)
+                let Added = false;
+                Schedule?.map(el => {
+                    if(el.date === date.toISOString()){
+                        content.push(
+                            <UserCell id={{id:i, userID: UserID, idSchedule: el.id, isNew: false}} ShowRedact={ShowRedact} isShowRedact={isShowRedact} key={i+"-"+UserID} TypeId={el.type_id-1}>
+                                {isShowRedact[0]?.id === i && isShowRedact[0]?.userID === UserID? 
+                                    <Modal>
+                                        <Button onClick={() => MoreAddSchedule(1)}>Рабочик День</Button>
+                                        <Button onClick={() => MoreAddSchedule(2)}>Выходной</Button>
+                                        <Button onClick={() => MoreAddSchedule(3)}>Отпуск</Button>
+                                        <Button onClick={() => MoreAddSchedule(4)}>Больничный</Button>
+                                        <Button onClick={() => MoreAddSchedule(5)}>Увольнение</Button>
+                                    </Modal> 
+                                : null}
+                            </UserCell>
+                        ) 
+                        Added = true;
                     }
-                } else{
-                    content.push(<UserCell  key={i+" dayOp"} idSchedule={null} idUser={UserID} Func={AddSchedule} Date={date} TypeId={null}>s</UserCell>)
+                })
+                if(!Added){
+                    content.push(
+                        <UserCell id={{id:i, userID: UserID, date: date, isNew: true}} ShowRedact={ShowRedact} isShowRedact={isShowRedact} key={i+"-"+UserID}>
+                            {isShowRedact[0]?.id === i && isShowRedact[0]?.userID === UserID? 
+                                <Modal onClick={() => {ShowRedact([])}}>
+                                    <Button onClick={() => {MoreAddSchedule(1)}}>Рабочик День</Button>
+                                    <Button onClick={() => {MoreAddSchedule(2)}}>Выходной</Button>
+                                    <Button onClick={() => {MoreAddSchedule(3)}}>Отпуск</Button>
+                                    <Button onClick={() => {MoreAddSchedule(4)}}>Больничный</Button>
+                                    <Button onClick={() => {MoreAddSchedule(5)}}>Увольнение</Button>
+                                </Modal> 
+                            : null}
+                        </UserCell>
+                    )
                 }
             }   
         }
@@ -143,22 +193,24 @@ function DateTable({NowMounth, users, AddUser, DeleteUser, AddSchedule, ChangeSc
     return(
         <Table>
             <tbody>
-                <RowDefault>
-                    <CellStart/>
-                    {AddWeek()}
-                </RowDefault>
-                <RowDefault>
-                    <CellStart>Сотрудник</CellStart>
-                    {AddDay()}
-                </RowDefault>
+                {AddDefaultRow()}
                 {Users?.map((el, i) => {
                     return(
                         <Row key={i}>
                             <CellStart>
                                 {el.name? el.name : 
                                     <>
-                                        <input style={{height: "100%", background: "none", border: "none"}} placeholder="name" onChange={(e) => SetNewUser(e.target.value)}/>
-                                        <button style={{height: "100%", background: "none", border: "none", color: "var(--Blue-Link)"}} onClick={() => {AddUser(NewUser); SetNewUser(null)}}>Добавить</button>
+                                        <input 
+                                            style={{height: "100%", background: "none", border: "none"}} 
+                                            placeholder="name" 
+                                            onChange={(e) => SetNewUser(e.target.value)}
+                                        />
+                                        <button 
+                                            style={{height: "100%", background: "none", border: "none", color: "var(--Blue-Link)"}} 
+                                            onClick={() => {AddUser(NewUser); SetNewUser(null)}}
+                                        >
+                                            Добавить
+                                        </button>
                                     </>
                                 }  
                                 <div style={{display: "flex"}}>
@@ -171,8 +223,13 @@ function DateTable({NowMounth, users, AddUser, DeleteUser, AddSchedule, ChangeSc
                     )
                 })}
                 <Row style={{border: "none"}}>
-                    <CellStart style={{ color: "var(--Blue-Link)", justifyContent: "flex-start"}} onClick={() => SetUsers([ ...Users, {name: ""}])}><Plus/> Добавить сотрудника</CellStart>
-                    {AddDayEmpty()}
+                    <CellStart 
+                        style={{ color: "var(--Blue-Link)", justifyContent: "flex-start"}} 
+                        onClick={() => SetUsers([ ...Users, {name: ""}])}
+                    >
+                        <Plus/> Добавить сотрудника
+                    </CellStart>
+                    {AddBottomRow()}
                 </Row>
             </tbody>
         </Table>

@@ -56,11 +56,20 @@ const deleteSchedule = (request, response) => {
         response.status(200).send(`Schedule deleted with ID: ${id}`)
     })
 }
+const deleteScheduleByUser = (id, response) => {
+    pool.query('DELETE FROM public.schedule WHERE user_id = $1', [id], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).send(`Schedule deleted with ID: ${id}`)
+    })
+}
 
 module.exports = {
     getSchedule,
     getScheduleByMounth,
     createSchedule,
     updateSchedule,
-    deleteSchedule
+    deleteSchedule,
+    deleteScheduleByUser
 }

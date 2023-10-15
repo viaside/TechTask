@@ -35,8 +35,7 @@ function Schedule() {
                 data.forEach(date => {
                     Userdata.forEach(user => {
                         if(user.id === date.user_id) {
-                            user.schedule === undefined? 
-                            user.schedule = [date] : user.schedule = [...user.schedule, date];
+                            user.schedule === undefined? user.schedule = [date] : user.schedule = [...user.schedule, date];
                         }
                     })                    
             });
@@ -70,7 +69,7 @@ function Schedule() {
             body: JSON.stringify({ id: id })
         };
         fetch('/user/' + id, requestOptions)
-        .then( await UpdateUser())
+        .finally( await UpdateUser())
     } 
     
     function AddSchedule(userId, date, typeId) {
@@ -122,8 +121,12 @@ function Schedule() {
                 </div>
             </div>
             <DateTable 
-                NowMounth={NowMounth} users={Users} AddUser={AddUser} DeleteUser={DeleteUser}
-                AddSchedule={AddSchedule} ChangeSchedule={ChangeSchedule}
+                NowMounth={NowMounth} 
+                users={Users} 
+                AddUser={AddUser} 
+                DeleteUser={DeleteUser}
+                AddSchedule={AddSchedule} 
+                ChangeSchedule={ChangeSchedule}
             />
         </Content>
         </>

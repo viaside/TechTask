@@ -1,4 +1,5 @@
 const pool = require('./queries').pool;
+const Schedule = require('./Schedule');
 
 const getUser = (request, response) => {
     pool.query('SELECT * FROM public."user" ORDER BY id ASC', (error, results) => {
@@ -51,7 +52,7 @@ const updateUser = (request, response) => {
 
 const deleteUser = (request, response) => {
     const id = parseInt(request.params.id)
-
+    pool.query('DELETE FROM public.schedule WHERE user_id = $1', [id]);
     pool.query('DELETE FROM public."user" WHERE id = $1', [id], (error, results) => {
         if (error) {
             throw error

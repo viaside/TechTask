@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import { useState } from "react";
+import { Children, useState } from "react";
 
 const Cell = styled.td`
     display: flex;
@@ -15,6 +15,8 @@ const Cell = styled.td`
     align-items: center;
     align-self: stretch;
     border-left: 1px solid var(--Middle-Gray-Blue, #B8C4DB);
+    overflow: hidden;
+
 `
 
 const Modal = styled.div`
@@ -26,47 +28,70 @@ const Modal = styled.div`
     margin-top: 240px;
 ` 
 
-const Button = styled.div`
-    display: flex;
-    width: 300px;
-    padding: 10px 24px;
-    align-items: flex-start;
-    background-color: var(--White);
-    font-size: var(--font-medium);
-    border-bottom: solid 1px var(--Gray);
-    transition: 0.5s;
-    &:hover{
-        cursor: pointer;
-        background-color: var(--Gray);
-    };
-`   
-
-function UserCell({idSchedule, idUser, Func, TypeId, Date}) {
-    const [isShow, Show] = useState(false);
+function UserCell(props) {
+    const {id, ShowRedact, isShowRedact, idSchedule, idUser, Func, TypeId, Date} = props
     const TypeList = [
-        {id: 1, name: "1", BGcolor: "none"},
-        {id: 2, name: "н", BGcolor: "var(--Red-Shade)"},
+        {id: 1, name: "1", BGcolor: "var(--White)", color: "var(--Dark)"},
+        {id: 2, name: "Н", BGcolor: "var(--Red-Shade)", color: "var(--Dark)"},
         {id: 3, name: "о", BGcolor: "var(--Blue-Status)", color: "var(--White)"},
-        {id: 4, name: "б", BGcolor: "var(--Yellow-Status)"},
+        {id: 4, name: "б", BGcolor: "var(--Yellow-Status)", color: "var(--Dark)"},
         {id: 5, name: "у", BGcolor: "var(--Red-Status)", color: "var(--White)"}
     ];
+
+    let isSelected = false;
+    isShowRedact?.map(el => {
+        if(el.id === id.id && el.userID === id.userID){
+            isSelected = true
+            return;
+        }
+    })
+
+    const addRedact = () =>{
+        let newArray = [];
+        let have = false;
+        if(isShowRedact.length != 0){
+            isShowRedact.map(el =>{
+                if(el.id === id.id && el.userID === id.userID){
+                    have = true;
+                } 
+            })
+            if(!have){
+                newArray = [...isShowRedact, id];
+            } else{
+                isShowRedact.map(el => {
+                    if(el.id === id.id && el.userID === id.userID){
+
+                    } else{
+                        newArray.push(el);
+                    }
+                })
+            }
+        } else{
+            newArray.push(id);
+        }
+        ShowRedact(newArray);
+    }
+
     return(
-        <Cell 
-            style={{backgroundColor: TypeList[TypeId]?.BGcolor, color: TypeList[TypeId]?.color, 
-                    outline: isShow? "2px solid var(--Red)": null, borderRadius: isShow? "2px" : null,
-                    zIndex: isShow? "1000" : null  
-            }} onClick={() => Show(!isShow)}>
-            {TypeList[TypeId]?.name}
-            {isShow? 
-            <Modal onClick={() => {Show(!isShow)}}>
-                <Button onClick={() => idSchedule? Func(idSchedule, 1) : Func(idUser, Date, 1)}>Рабочик День</Button>
-                <Button onClick={() => idSchedule? Func(idSchedule, 2) : Func(idUser, Date, 2)}>Выходной</Button>
-                <Button onClick={() => idSchedule? Func(idSchedule, 3) : Func(idUser, Date, 3)}>Отпуск</Button>
-                <Button onClick={() => idSchedule? Func(idSchedule, 4) : Func(idUser, Date, 4)}>Больничный</Button>
-                <Button onClick={() => idSchedule? Func(idSchedule, 5) : Func(idUser, Date, 5)}>Увольнение</Button>
-            </Modal>
-            :null}
-        </Cell>
+        <div>
+            <Cell 
+                style={{
+                    backgroundColor: TypeList[TypeId]?.BGcolor, 
+                    color: TypeList[TypeId]?.color, 
+                    border: isSelected? "2px solid var(--Red)": null, 
+                    maxWidth: isSelected? "17px": "20px", 
+                    maxHeight: isSelected? "25px": "27px", 
+                    minWidth: isSelected? "17px": "20px", 
+                    minHeight: isSelected? "25px": "27px", 
+                    borderRadius: isSelected? "2px" : null,
+                    zIndex: isSelected? "1000" : null
+                }} 
+                onClick={() => addRedact()}
+            >
+                {TypeList[TypeId]?.name || "-"}
+            </Cell>
+            {props.children}
+        </div>
     )
 }
 
