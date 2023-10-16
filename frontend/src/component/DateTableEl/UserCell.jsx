@@ -71,6 +71,8 @@ function UserCell(props) {
         }
         ShowRedact(newArray);
     }
+    const Left = isShowRedact.find(e => e.id === id.id-1 && e.userID === id.userID) !== undefined;
+    const Right = isShowRedact.find(e => e.id === id.id+1 && e.userID === id.userID) !== undefined;
 
     return(
         <div>
@@ -79,6 +81,8 @@ function UserCell(props) {
                     backgroundColor: TypeList[TypeId]?.BGcolor, 
                     color: TypeList[TypeId]?.color, 
                     border: isSelected? "2px solid var(--Red)": null, 
+                    borderLeftColor: isSelected? Left? "transparent" : "var(--Red)" : null,
+                    borderRightColor: isSelected? Right? "transparent" : "var(--Red)" : null,
                     maxWidth: isSelected? "17px": "20px", 
                     maxHeight: isSelected? "25px": "27px", 
                     minWidth: isSelected? "17px": "20px", 
